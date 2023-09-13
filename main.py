@@ -2,6 +2,7 @@ import time
 import random
 import string
 import pyautogui
+import os
 from pynput import mouse, keyboard
 
 
@@ -12,9 +13,11 @@ class MacroRecorder:
         self.stop_replay = False
         self.mouse_press_time = None
         self.keyboard_controller = keyboard.Controller()
+        if not os.path.exists(os.path.join(os.path.dirname(os.path.realpath(__file__)),f"recordings")):
+            os.mkdir(os.path.join(os.path.dirname(os.path.realpath(__file__)),f"recordings"))
 
     def on_mouse_click(self, x, y, button, pressed):
-        click_duration_threshold = 0.1
+        click_duration_threshold = 0.15
         if self.recording:
             if pressed:
                 self.mouse_press_time = time.perf_counter()
@@ -49,7 +52,7 @@ class MacroRecorder:
 
     def save_actions(self):
         filename = self.generate_filename()
-        filename = f"recordings/{filename}.macro"
+        filename = os.path.join(os.path.dirname(os.path.realpath(__file__)),f"recordings\{filename}.macro")
 
         try:
             with open(filename, "w") as file:
@@ -69,7 +72,6 @@ class MacroRecorder:
 
     def load_actions(self, filename):
         try:
-            filename = f"recordings/{filename}"
 
             with open(filename, "r") as file:
                 actions = file.readlines()
@@ -226,11 +228,11 @@ def record_actions(recorder):
 
 def load_actions(recorder):
     filename = input("Enter the filename to load actions: ")
-    recorder.load_actions(filename)
+    recorder.load_actions(os.path.join(os.path.dirname(os.path.realpath(__file__)),f"recordings\{filename}"))
 
 def three_second_countdown_before_start():
     for i in range(3, 0, -1):
-        print(f"Count down before start: {i}", end="\r")
+        print(f"Count down before start: {i}", end="\n")
         time.sleep(1)
 
 def main():
